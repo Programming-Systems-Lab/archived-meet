@@ -201,4 +201,11 @@ public class Manager implements IProbe, IManager {
         return MEET_SUCCESS;
     }
     
+    /** identify this module
+     * @return title of this module
+     */
+    public String getName() {
+        return "Generic Manager";
+    }
+    
 }
