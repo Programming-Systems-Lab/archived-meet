@@ -77,7 +77,7 @@ public interface IProbeable {
      *   Probe-Configuration-Name can generate while it is activated. This
      *   request is answered through a Generate-Sensed event.
      */
-    void query-sensed(String confName, String host);
+    void querySensed(String confName, String host);
     
     /**
      *   Parameter1 through ParameterN are passed to the already installed 
