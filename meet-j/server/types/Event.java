@@ -82,7 +82,7 @@ public class Event extends Object implements IEvent {
     
     /*
     private String examplePrivateMethod() {
-      return "examplePrivateMethod value";
+      
     }
      */
     

@@ -22,6 +22,11 @@ public class Manager implements IProbe, IManager {
     protected LinkedHashSet modules;
     protected String myName;
     
+    /** supposed to be globally unique node id.  Inability
+     * to access MAC address in Java makes this problematic.
+     */
+    protected static long nodeID;
+    
     /** Creates a new instance of Manager */
     public Manager() {
         this(null);
@@ -30,8 +35,27 @@ public class Manager implements IProbe, IManager {
     public Manager(String name) {
         modules = new LinkedHashSet();
         myName = name;
+        
+        // nodeID composed of low four bytes of timestamp + IP address
+        byte [] barr = null;
+        try {
+            barr = java.net.InetAddress.getLocalHost().getAddress();
+        } catch (java.net.UnknownHostException uhe) {
+            uhe.printStackTrace();
+        }
+        // note that Java provides no way to get from byte[4] to int
+        // short of building a DataInputStream on a ByteArrayInputStream!
+        nodeID = (System.currentTimeMillis() << 32) | 
+                 (barr[0] << 24) | 
+                 (barr[1] << 16) | 
+                 (barr[2] << 16) | 
+                 (barr[3]) ;
+        
         logger.debug("Manager " + myName + ": created");
     }
+    
+    public static long getNodeID() { return nodeID; }
+    
     
     
     /**
