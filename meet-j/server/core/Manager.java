@@ -7,8 +7,9 @@
 package psl.meet.server.core;
 
 import org.apache.log4j.Logger;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Iterator;
+import java.util.prefs.Preferences;
 
 /**
  *
@@ -18,7 +19,7 @@ public class Manager implements IProbe, IManager {
     
     static Logger logger = Logger.getLogger(Manager.class);
     
-    protected LinkedHashMap modules;
+    protected LinkedHashSet modules;
     protected String myName;
     
     /** Creates a new instance of Manager */
@@ -27,7 +28,7 @@ public class Manager implements IProbe, IManager {
     }
     
     public Manager(String name) {
-        modules = new LinkedHashMap();
+        modules = new LinkedHashSet();
         myName = name;
         logger.debug("Manager " + myName + ": created");
     }
@@ -44,13 +45,13 @@ public class Manager implements IProbe, IManager {
     }
     
     /**
-     * returns an integer representing the status of the manager itself
+     * return an iterator over loaded IModules
      * @return success code
      *
      */
-    public List list() throws MEETException {
+    public Iterator list() throws MEETException {
         logger.debug("Manager " + myName + ": list() called");
-        return java.util.Collections.EMPTY_LIST;
+        return modules.iterator();
     }
     
     /** Return a string uniquely identifying this instance of the probe type.
@@ -154,6 +155,7 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int add(IModule im) throws MEETException {
+        modules.add(im);
         return MEET_SUCCESS;
     }
     
@@ -162,7 +164,8 @@ public class Manager implements IProbe, IManager {
      * @return success code
      * @throws MEETException Internal error
      */
-    public int delete(IModule im) throws MEETException {
+    public int remove(IModule im) throws MEETException {
+        modules.remove(im);
         return MEET_SUCCESS;
     }
     
@@ -182,6 +185,19 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int setDefault(IModule im) throws MEETException {
+        return MEET_SUCCESS;
+    }
+    
+    /**
+     * Tell manager where to find its configuration
+     * Needed because Manager will be created from classloader with null constructor
+     * @return success code
+     */
+    public int setConfig(String confName) {
+        myName = confName;
+        Preferences prefs = Preferences.systemNodeForPackage(this.getClass());
+        Preferences myPrefs = prefs.node(confName);
+        logger.debug("name and conf set to " + confName);
         return MEET_SUCCESS;
     }
     

@@ -5,7 +5,7 @@
  */
 
 package psl.meet.server.core;
-import java.util.List;
+import java.util.Iterator;
 
 /** 
  * Subsystem managers implement this interface, which allows individual
@@ -14,12 +14,19 @@ import java.util.List;
  */
 public interface IManager extends IModule{
     
+    /**
+     * Tell manager where to find its configuration
+     * Needed because Manager will be created from classloader with null constructor
+     * @return success code
+     */
+    int setConfig(String confName);
+    
     /** 
      * returns list of installed IModules
      * @return list of installed IModules
      *
      */   
-    List list() throws MEETException;
+    Iterator list() throws MEETException;
     
     /** 
      * add a new module to this subsystem
@@ -33,7 +40,7 @@ public interface IManager extends IModule{
      * @return success code
      * @throws MEETException Internal error
      */   
-    int delete(IModule im) throws MEETException;
+    int remove(IModule im) throws MEETException;
     
     /** 
      * instruct a module to restart itself
