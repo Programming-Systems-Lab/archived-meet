@@ -31,8 +31,8 @@ public class SNTPClock {
     long updateInterval;
     
     // NTP Server to use
-    final String server = "sundial.columbia.edu";
-    final int port = 123;
+    public String server;
+    public int port;
 
 
     /** Creates a new instance of SNTPClock */
@@ -60,23 +60,23 @@ public class SNTPClock {
     public void send(byte[] data) throws Exception {
 
         // create empty packet
-        //byte[] data = new byte[128];
+        //byte[] data = new byte[40];
 
         
         // create socket to server
-        InetAddress address = InetAddress.getByName("sundial.columbia.edu");
-	printByteArray(address.getAddress());
+        InetAddress address = InetAddress.getByName(server);
+	//printByteArray(address.getAddress());
 	//InetAddress address = InetAddress.getLocalHost();
 
         DatagramSocket socket = new DatagramSocket();
 	socket.connect(address,port);
 
         // create packet
-        DatagramPacket packet = new DatagramPacket(data,128,address,port);
+        DatagramPacket packet = new DatagramPacket(data,data.length,address,port);
 
         
         // send packet
-        System.out.println("Attempting to send packet\n");
+        System.out.println("Attempting to send packet to " + socket.getInetAddress() + " (" + socket.getPort()  + ")\n");
         socket.send(packet);
         System.out.println("Packet sent\n");
         
@@ -86,8 +86,10 @@ public class SNTPClock {
 	byte[] rx = new byte[128];
 	packet = new DatagramPacket(rx,128);
 
+	//socket.disconnect();
+	//socket.close();
 
-
+	
         System.out.println("waiting for packet\n");
         socket.receive(packet);
             
@@ -96,18 +98,19 @@ public class SNTPClock {
 
         System.out.println("received: ");
         printByteArray(packet.getData());
-
+		
+	
 	
     }
     
     public void receive() throws Exception {
         
         //create empty packet
-        byte[] data = new byte[128];
-        DatagramPacket packet = new DatagramPacket(data,128);
+        byte[] data = new byte[40];
+        DatagramPacket packet = new DatagramPacket(data,40);
         
         // create socket
-        DatagramSocket socket = new DatagramSocket(3156);
+        DatagramSocket socket = new DatagramSocket(123);
         
         // wait for socket
 
@@ -175,15 +178,20 @@ public class SNTPClock {
 
     public static byte[] createSNTPRequest(byte[] time) {
 	
-	byte[] output = new byte[128];
-	output[0] = 67;
+	byte[] output = new byte[48];
+
 	
-	for (int i=1; i < output.length; i++) {
+	for (int i=0; i < output.length; i++) {
 	    output[i] = 0;
 	}
 
+	output[0] = 35;
+	output[1] = 3;
+	output[2] = 10;
+	output[3] = -15;
+
 	for (int i=0; i < 8; i++) {
-	    output[32+i] = time[i];
+	    output[40+i] = time[i];
 	}
 
 	return output;
@@ -262,13 +270,16 @@ public class SNTPClock {
 	System.out.println("");
 
 	byte[] b2 = createSNTPRequest(b);
-	//printByteArray(b2);
+	printByteArray(b2);
 
 	SNTPClock sc = new SNTPClock();
 
+	sc.server = args[0];
+	sc.port = Integer.parseInt(args[1]);
+
 	sc.send(b2);
 
-	sc.receive();
+	//sc.receive();
 
     }
     
