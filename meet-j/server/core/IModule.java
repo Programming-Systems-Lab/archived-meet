@@ -24,7 +24,12 @@ public interface IModule {
      *
      */    
     int getStatus();
-    
+        
+    /**
+     * identify this module
+     * @return title of this module
+     */
+    String getName();
 
     /** 
      * tell a module to halt processing

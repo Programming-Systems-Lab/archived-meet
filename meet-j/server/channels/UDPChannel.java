@@ -20,18 +20,18 @@ import psl.meet.server.core.*;
  *
  * @author  phil
  */
-public class UDPChannel implements psl.meet.server.core.IModule {
+public class UDPChannel implements IModule {
     
     private static final int DEFAULT_PORT = 0xEEEE;
     private static final String myClass = "UDPChannel";
     static Logger logger = Logger.getLogger(UDPChannel.class);
     
-    Selector acceptSelector = null;
+    Selector selector = null;
     
     /** Creates a new instance of UDPChannel */
     public UDPChannel() {
         try {
-            acceptSelector = SelectorProvider.provider().openSelector();
+            selector = SelectorProvider.provider().openSelector();
         } catch (IOException ioe) {
             logger.error(myClass + ": couldn't get default selector", ioe);
         }
@@ -54,6 +54,29 @@ public class UDPChannel implements psl.meet.server.core.IModule {
         return MEET_STATUS_OK;
     }
     
+    /** identify this module
+     * @return title of this module
+     */
+    public String getName() {
+        return "UDPChannel";
+    }    
     
+    /**
+     * tell a module to become active
+     * @return success code
+     * @throws MEETException Internal error
+     */
+    public int start() throws MEETException {
+        return MEET_SUCCESS;
+    }    
+    
+    /**
+     * tell a module to halt processing
+     * @return success code
+     * @throws MEETException Internal error
+     */
+    public int stop() throws MEETException {
+        return MEET_SUCCESS;
+    }
     
 }
