@@ -280,7 +280,7 @@ public class SNTPClock implements MEETClock {
       if (DEBUG) System.out.println("about to sc.getNTP()");
       sc.getNTP();
       
-      System.out.println(new Date(sc.getTime()) + "\t\t" +
+      System.out.println(sc.getTime() + "\t\t" +
         sc.getOffset() + "\t\t" + (sc.getOffset() - oldOffset));
       oldOffset = sc.getOffset();
       

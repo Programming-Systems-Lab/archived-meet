@@ -1,0 +1,73 @@
+/*
+ * NTPTimeStamp64.java
+ *
+ * Created on December 24, 2002, 5:37 AM
+ */
+
+package psl.meet.server.clocks;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
+/**
+ *
+ * @author  phil
+ */
+public class NTPTSRaw64 {
+  
+    /**  for reading from byte array.
+   initialized on first use
+   */
+  private DataInputStream _dis = null;
+  
+  /**  for writing to byte array.
+   initialized on first use
+   */
+  private DataOutputStream _dos = null;
+  
+  /**  holds byte array.
+   initialized on first use
+   */
+  private byte [] _bytearray;
+ 
+    
+    /**
+   * create an NTPTimeStamp given 8 bytes in the NTP Timestamp format
+   */
+  public NTPTSRaw64(byte[] b) {
+    
+    // parse the bytes to get a long
+    if (_dis == null) {
+      _dis = new DataInputStream(new ByteArrayInputStream(b));
+    }
+    
+    secs = ((long) _dis.readInt()) & 0xFFFFFFFFL;
+    
+    
+        /* Phil says: can't be right:
+        byte[] d = new byte[4];
+         
+        for (int i=0; i<4; i++) {
+            d[i] = b[i+4];
+        }
+         
+        // parse last four bytes
+        fracsecs = bytesToFloat(d);
+         */
+    c[1] = b[4];
+    c[2] = b[5];
+    c[3] = b[6];
+    c[4] = b[7];
+    bigint = new BigInteger(c);
+    
+    final long tmp = 1L << 32;
+    final double intscale = (double) tmp;
+    
+    fracsecs = (float) (bigint.doubleValue() / intscale);
+    
+    System.out.println("got " + secs + " + " + fracsecs);
+    
+  }
+  
+}

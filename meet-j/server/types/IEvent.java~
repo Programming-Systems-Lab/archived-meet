@@ -62,15 +62,6 @@ public interface IEvent {
     public static final int MEET_PRIMITIVE_CHAR32   = 102;
     
     // 4 byte secs since 1 Jan 1970 GMT, 4 bytes fraction
-    public static final int MEET_PRIMITIVE_TSTAMP   = 200;
-    
-    // char string (no length, no null term)
-    public static final int MEET_PRIMITIVE_RSTRING  = 300;
-
-    // char string (null terminated)
-    public static final int MEET_PRIMITIVE_CSTRING  = 301;
-
-    // char string (prefixed with length byte)
-    public static final int MEET_PRIMITIVE_PSTRING  = 302;
+    public static final int MEET_PRIMITIVE_TSTAMP   = 200;  
 
 }

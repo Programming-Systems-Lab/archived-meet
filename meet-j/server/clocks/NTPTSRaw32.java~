@@ -1,0 +1,16 @@
+/*
+ * NTPTimeStamp.java
+ *
+ * Created on December 6, 2002, 1:41 AM
+ */
+package psl.meet.server.clocks;
+
+import java.util.Date;
+import java.lang.Math;
+
+/**
+ *
+ * @author phil
+ */
+
+public class NTPTimeStamp32 {}

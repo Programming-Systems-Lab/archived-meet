@@ -1,0 +1,94 @@
+/*
+ * NTPTimeStamp64.java
+ *
+ * Created on December 24, 2002, 5:37 AM
+ */
+
+package psl.meet.server.clocks;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.text.*;
+import java.text.DecimalFormat.*;
+import java.text.NumberFormat.Field;
+
+
+/**
+ *
+ * @author  phil
+ */
+public class NTPTimeStamp64 {
+  
+  
+  final static double SCALE = (double) (4294967296.0);
+  final static DecimalFormat fmt = new DecimalFormat(".000000000");
+  final static FieldPosition fpDecSep =
+  new FieldPosition(java.text.NumberFormat.Field.DECIMAL_SEPARATOR);
+  private long _secs = 0;
+  private long _frac = 0;
+  private double _fracDouble = 0.0;
+  
+  
+  /**
+   * create an NTPTimeStamp given a DataInputStream
+   *positioned right before the NTP packet bytes
+   */
+  public NTPTimeStamp64(DataInputStream dis) throws IOException {
+    
+    // parse the bytes to get a long
+    if (dis == null) {
+      throw new IOException("NTPTSRaw64 ctor: dis uninitialized");
+    }
+    
+    _secs = ((long) dis.readInt()) & 0xFFFFFFFFL;  // force unsigned
+    
+    // max of unsigned long
+    
+    _frac = ((long) dis.readInt()) & 0xFFFFFFFFL;  // force unsigned
+    _fracDouble = _frac / SCALE;
+    System.out.println("_secs, _frac = " + Long.toHexString(_secs) + 
+    ", " + Long.toHexString(_frac));
+    
+  }
+  
+  public String toString() {
+    StringBuffer sb = new StringBuffer(10);
+    fmt.format(_fracDouble, sb, fpDecSep);
+    // return ("" + _secs + "--" + sb);
+    return ("" + _secs + sb);
+  }
+  
+  public static void main(String args[]) {
+    byte [] test1 = {
+      0x00, 0x00, 0x00, 0x01,
+      0x00, 0x00, 0x00, 0x01
+    };
+    byte [] test2 = {
+      0x0F, 0x00, 0x00, 0x00,
+      0x0F, 0x00, 0x00, 0x00
+    };
+    byte [] test3 = {
+      0x7F, 0x00, 0x00, 0x01,
+      0x7F, 0x00, 0x00, 0x00
+    };
+    java.io.ByteArrayInputStream bais1 = new java.io.ByteArrayInputStream(test1);
+    java.io.ByteArrayInputStream bais2 = new java.io.ByteArrayInputStream(test2);
+    java.io.ByteArrayInputStream bais3 = new java.io.ByteArrayInputStream(test3);
+    
+    NTPTimeStamp64 ntp1 = null;
+    NTPTimeStamp64 ntp2 = null;
+    NTPTimeStamp64 ntp3 = null;
+    
+    try {
+      ntp1 = new NTPTimeStamp64(new DataInputStream(bais1));
+      ntp2 = new NTPTimeStamp64(new DataInputStream(bais2));
+      ntp3 = new NTPTimeStamp64(new DataInputStream(bais3));
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    }
+    System.out.println("test1 = " + ntp1);
+    System.out.println("test2 = " + ntp2);
+    System.out.println("test3 = " + ntp3);
+  }
+}
