@@ -6,6 +6,9 @@
 
 package psl.meet.server.clocks;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  *
  * @author  mkuba
@@ -17,6 +20,12 @@ public class LamportClock {
     /** Creates a new instance of LamportClock */
     public LamportClock() {
         clock = 0;
+
+        Timer t = new Timer();
+        
+        // every second
+        t.scheduleAtFixedRate(new updateTask(),0,1000);
+        
     }
     
     public long getLamport() {
@@ -29,7 +38,19 @@ public class LamportClock {
             clock = time + 1;
         } else {
         }
-        
+    }
+    
+    class updateTask extends TimerTask {
+        public void run() {
+            clock++;
+            //DEBUG
+            System.out.println("Clock = " + clock);
+        }
+    }
+    
+    public static void main(String args[]) {
+        LamportClock l1 = new LamportClock();
+        LamportClock l2 = new LamportClock();
     }
     
 }
