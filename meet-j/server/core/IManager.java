@@ -5,47 +5,35 @@
  */
 
 package psl.meet.server.core;
+import java.util.List;
 
 /** 
  * Subsystem managers implement this interface, which allows individual
  * implementations to be added, removed, stopped, started, etc.
  * @author phil
  */
-public interface IManager {
-    
-    // result codes
-    public static final int MEET_SUCCESS = 0;
-    
-    // status codes
-    public static final int MEET_STATUS_OK = 0;
+public interface IManager extends IModule{
     
     /** 
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     *
-     */    
-    int getStatus();
-    
-    /** 
-     * returns an array of strings naming the installed modules
-     * @return success code
+     * returns list of installed IModules
+     * @return list of installed IModules
      *
      */   
-    String[] list();
+    List list() throws MEETException;
     
     /** 
      * add a new module to this subsystem
      * @return success code
      * @throws MEETException Internal error
      */   
-    int add() throws MEETException;
+    int add(IModule im) throws MEETException;
     
     /** 
      * remove a module from this subsystem
      * @return success code
      * @throws MEETException Internal error
      */   
-    int delete() throws MEETException;
+    int delete(IModule im) throws MEETException;
     
     /** 
      * instruct a module to restart itself
@@ -53,21 +41,7 @@ public interface IManager {
      * @throws MEETException Internal error
      *
      */   
-    int reload() throws MEETException;
-    
-    /** 
-     * tell a module to halt processing
-     * @return success code
-     * @throws MEETException Internal error
-     */   
-    int stop() throws MEETException;
-    
-    /** 
-     * tell a module to become active
-     * @return success code
-     * @throws MEETException Internal error
-     */   
-    int start() throws MEETException;
+    int reload(IModule im) throws MEETException;
     
     /** 
      * stop all modules in this subsystem
@@ -88,7 +62,7 @@ public interface IManager {
      * @return success code
      * @throws MEETException Internal error
      */   
-    int setDefault(String module) throws MEETException;
+    int setDefault(IModule im) throws MEETException;
         
     /** 
      * freeze setup of this subsystem

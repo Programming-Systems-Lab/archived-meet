@@ -8,13 +8,14 @@ package psl.meet.server.core;
 
 import org.apache.log4j.Logger;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  *
  * @author  phil
  */
 public class Manager implements IProbe, IManager {
-
+    
     static Logger logger = Logger.getLogger(Manager.class);
     
     protected LinkedHashMap modules;
@@ -25,56 +26,32 @@ public class Manager implements IProbe, IManager {
         this(null);
     }
     
-    public Manager (String name) {
+    public Manager(String name) {
         modules = new LinkedHashMap();
         myName = name;
         logger.debug("Manager " + myName + ": created");
     }
     
     
-    /** 
+    /**
      * returns an integer representing the status of the manager itself
      * @return success code
      *
-     */    
+     */
     public int getStatus() {
         logger.debug("Manager " + myName + ": getStatus called");
         return MEET_STATUS_OK;
     }
     
-    /** 
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     *
-     */   
-    public String[] list() {
-        String dummy[] = new String[1];
-        logger.debug("Manager " + myName + ": list() called");
-        return dummy;
-    }
-    
-     /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     * @throws MEETException Internal error
-     */
-    public int add() throws MEETException {
-        logger.debug("Manager " + myName + ": add called");
-        return MEET_STATUS_OK;
-    }
-    
-    
     /**
      * returns an integer representing the status of the manager itself
      * @return success code
-     * @throws MEETException Internal error
+     *
      */
-    public int delete() throws MEETException {
-        logger.debug("Manager " + myName + ": delete called");
-        return MEET_STATUS_OK;
+    public List list() throws MEETException {
+        logger.debug("Manager " + myName + ": list() called");
+        return java.util.Collections.EMPTY_LIST;
     }
-    
-    
     
     /** Return a string uniquely identifying this instance of the probe type.
      * Ideally globabally unique, but at least unique in combination with location
@@ -84,16 +61,6 @@ public class Manager implements IProbe, IManager {
         return "this one right here";
     }
     
-        /** 
-     * instruct a module to restart itself
-     * @return success code
-     * @throws MEETException Internal error
-     *
-     */   
-    public int reload() throws MEETException {
-        return MEET_STATUS_OK;
-    }
-
     /** return a string representing the location of this probe, generally based
      * on the location/identity of the "probee"
      */
@@ -110,7 +77,7 @@ public class Manager implements IProbe, IManager {
     
     
     public int lock() throws MEETException {
-        return MEET_STATUS_OK;
+        return MEET_SUCCESS;
     }
     
     /**
@@ -119,7 +86,7 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int start() throws MEETException {
-        return MEET_STATUS_OK;
+        return MEET_SUCCESS;
     }
     
     /**
@@ -128,27 +95,27 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int stop() throws MEETException {
-        return MEET_STATUS_OK;
+        return MEET_SUCCESS;
     }
     
-        /** 
+    /**
      * stop all modules in this subsystem
      * @return success code
      * @throws MEETException Internal error
-     */   
+     */
     public int stopAll() throws MEETException {
-        return MEET_STATUS_OK;
+        return MEET_SUCCESS;
     }
     
-    /** 
+    /**
      * start all modules in this subsystem
      * @return success code
      * @throws MEETException Internal error
-     */   
+     */
     public int startAll() throws MEETException {
-        return MEET_STATUS_OK;
+        return MEET_SUCCESS;
     }
-
+    
     /**   Parameter1 through ParameterN are passed to the probe to "focus" its
      *   sensors
      *   as specified by the parameters. How it interprets these parameters
@@ -162,24 +129,15 @@ public class Manager implements IProbe, IManager {
      *   request is answered through a Generate-Sensed event.
      */
     public void querySensed() {
-
+        
     }
-    
+        
     /**
-     * start all modules in this subsystem
-     * @return success code
-     * @throws MEETException Internal error
-     */
-    public int setDefault(String module) throws MEETException {
-        return MEET_STATUS_OK;
-    }
-    
-    /** 
      *   The probe is activated so that it
      *   senses behavior in the running system. In this activated state, the
      *   probes may issue Sense events for some subset of the behavior they
-     *   observe. 
-     */    
+     *   observe.
+     */
     public void activate() { }
     
     /**
@@ -188,6 +146,43 @@ public class Manager implements IProbe, IManager {
      *   system. In this deactivated state, the probe may not issue any Sense
      *   events.
      */
-    public void deactivate() { }    
-
+    public void deactivate() { }
+    
+    /**
+     * add a new module to this subsystem
+     * @return success code
+     * @throws MEETException Internal error
+     */
+    public int add(IModule im) throws MEETException {
+        return MEET_SUCCESS;
+    }
+    
+    /**
+     * remove a module from this subsystem
+     * @return success code
+     * @throws MEETException Internal error
+     */
+    public int delete(IModule im) throws MEETException {
+        return MEET_SUCCESS;
+    }
+    
+    /**
+     * instruct a module to restart itself
+     * @return success code
+     * @throws MEETException Internal error
+     *
+     */
+    public int reload(IModule im) throws MEETException {
+        return MEET_SUCCESS;
+    }
+    
+    /**
+     * distinguish one installed module as the default
+     * @return success code
+     * @throws MEETException Internal error
+     */
+    public int setDefault(IModule im) throws MEETException {
+        return MEET_SUCCESS;
+    }
+    
 }
