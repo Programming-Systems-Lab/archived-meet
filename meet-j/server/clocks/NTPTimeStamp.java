@@ -3,7 +3,7 @@
  *
  * Created on December 6, 2002, 1:41 AM
  */
-//package psl.meet.server.clocks;
+package psl.meet.server.clocks;
 
 import java.util.BitSet;
 import java.util.Date;
@@ -36,7 +36,7 @@ public class NTPTimeStamp {
 
 	// parse into fracsecs
 	float foo = (float)(now.getTime() % 1000);
-	fracsecs = foo / 1000;
+	fracsecs = foo / 1000.0f;
     }
 
 
@@ -52,7 +52,7 @@ public class NTPTimeStamp {
 
 	// parse into fracsecs
 	float foo = (float)(now.getTime() % 1000);
-	fracsecs = foo / 1000;
+	fracsecs = foo / 1000.0f;
 
     }
 
@@ -64,7 +64,7 @@ public class NTPTimeStamp {
     public NTPTimeStamp(long time, int tz) {
 	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
 	float foo = (float)(time % 1000);
-	fracsecs = foo / 1000;
+	fracsecs = foo / 1000.0f;
     }
 
     /**
@@ -75,7 +75,7 @@ public class NTPTimeStamp {
 	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
 
 	float foo = (float)(time % 1000);
-	fracsecs = foo / 1000;
+	fracsecs = foo / 1000.0f;
     }
 
 
@@ -96,6 +96,7 @@ public class NTPTimeStamp {
 	BigInteger bigint = new BigInteger(c);
         secs = bigint.longValue();
 
+        /* Phil says: can't be right:
 	byte[] d = new byte[4];
 
 	for (int i=0; i<4; i++) {
@@ -103,7 +104,15 @@ public class NTPTimeStamp {
 	}
 
 	// parse last four bytes
-	fracsecs = bytesToFloat(d);
+        fracsecs = bytesToFloat(d);
+         */
+	c[1] = b[4];
+	c[2] = b[5];
+	c[3] = b[6];
+	c[4] = b[7];
+        bigint = new BigInteger(c);
+        fracsecs = 1.0f / bigint.floatValue();
+        
     }
 
     /**
@@ -126,7 +135,7 @@ public class NTPTimeStamp {
      * return milliseconds since 1900
      */
     public long getLong() {
-	long foo = (long)(1000 * fracsecs);
+	long foo = (long)(1000.0 * fracsecs);
 
 	//System.out.println("secs = " + secs);
 	//System.out.println("fracsecs = " + fracsecs);
