@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MEET-2</name>
+    </assembly>
+    <members>
+        <member name="T:MEET_2.Connect">
+            <summary>
+            Summary description for Connect.
+            </summary>
+        </member>
+        <member name="M:MEET_2.Connect.#ctor(MEETLib.MEETNode)">
+            <summary>
+            Connect socket to remote system
+            </summary>
+            <param name="node"></param>
+        </member>
+        <member name="M:MEET_2.Connect.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+        </member>
+        <member name="M:MEET_2.Connect.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="P:MEET_2.Connect.MipLocalEndPoint">
+            <summary>
+            local endpoint
+            </summary>
+        </member>
+        <member name="P:MEET_2.Connect.MipRemoteEndPoint">
+            <summary>
+            remote we're talking to
+            </summary>
+        </member>
+        <member name="T:MEET_2.MEETForm">
+            <summary>
+            Summary description for Form1.
+            </summary>
+        </member>
+        <member name="F:MEET_2.MEETForm.m_name">
+            <summary>
+            Class name
+            </summary>
+        </member>
+        <member name="M:MEET_2.MEETForm.#ctor">
+            <summary>
+            Input form for demo
+            </summary>
+        </member>
+        <member name="M:MEET_2.MEETForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+        </member>
+        <member name="M:MEET_2.MEETForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:MEET_2.MEETForm.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="M:MEET_2.MEETForm.Scroller(System.Object,System.EventArgs)">
+            <summary>
+            Keep bottom of list in view
+            </summary>
+            <param name="sender"></param>
+            <param name="ea"></param>
+        </member>
+    </members>
+</doc>

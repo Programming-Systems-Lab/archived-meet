@@ -1,0 +1,37 @@
+TODO
+
+ReFactoring
+
+MEETNode -> MEETContainer
+
+MEETSockConnection -> MEETModule
+
+
+////
+
+Containers need to be able to really manage their associated modules
+	list names
+	names + status (MEETModuleInfo?)
+	
+Two phase shutdown for PCqueues?
+	block incoming
+	wait a while
+	kill queue
+
+associate bidirectional sockets + thread pair with interfaces
+	default per IF is listen on 0xEEEE, send to broadcast
+	broadcast announcement, Replies suggest port numbers
+
+web service config interface
+	
+need to model initial tree after bridging algorithm
+
+resizable controls in forms
+
+subscriptions can have timeouts
+
+stream subscriptions
+
+measure during connect and after, via advertise and publish
+
+module restart?

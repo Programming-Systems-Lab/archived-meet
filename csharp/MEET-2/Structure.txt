@@ -1,0 +1,11 @@
+MEET architecture is based around container components that can hold one or more modules.
+Modules can be dynamically loaded and unloaded.  Theoretically an arbitrary graph of 
+container components is possible, but a specific skeletal structure may make the system
+more conceptually tractable.
+
+MEET itself represents individual instances as a compute-node container, attached to one
+or more interface containers.  The compute-node is responsible for packet classification,
+forwarding, and routing, as well as administrative control, security policy, and 
+measurement.  The interfaces handle interface-bound sending and receiving, as well as 
+channel-level security.  For instance, one interface may have TCP and UDP modules, 
+while another has TCP and raw Ethernet modules.

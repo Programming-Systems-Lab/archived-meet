@@ -1,0 +1,38 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEETLib", "..\MEETLib\MEETLib.csproj", "{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEET-2", "MEET-2.csproj", "{6EE49AE9-0B70-430A-B58F-2DFEC0663AD5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEETTest", "..\MEETTest\MEETTest.csproj", "{AE73A884-5D4E-4BB2-B866-47DFF2907845}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362} = {DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}.Debug.ActiveCfg = Debug|.NET
+		{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}.Debug.Build.0 = Debug|.NET
+		{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}.Release.ActiveCfg = Release|.NET
+		{DAAF8010-B0DB-4C88-A7A2-2F9DA1E47362}.Release.Build.0 = Release|.NET
+		{6EE49AE9-0B70-430A-B58F-2DFEC0663AD5}.Debug.ActiveCfg = Debug|.NET
+		{6EE49AE9-0B70-430A-B58F-2DFEC0663AD5}.Debug.Build.0 = Debug|.NET
+		{6EE49AE9-0B70-430A-B58F-2DFEC0663AD5}.Release.ActiveCfg = Release|.NET
+		{6EE49AE9-0B70-430A-B58F-2DFEC0663AD5}.Release.Build.0 = Release|.NET
+		{AE73A884-5D4E-4BB2-B866-47DFF2907845}.Debug.ActiveCfg = Debug|.NET
+		{AE73A884-5D4E-4BB2-B866-47DFF2907845}.Debug.Build.0 = Debug|.NET
+		{AE73A884-5D4E-4BB2-B866-47DFF2907845}.Release.ActiveCfg = Release|.NET
+		{AE73A884-5D4E-4BB2-B866-47DFF2907845}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
