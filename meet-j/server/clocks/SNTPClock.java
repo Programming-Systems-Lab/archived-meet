@@ -10,6 +10,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Date;
+import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.util.BitSet;
 
 
 /**
@@ -101,7 +104,7 @@ public class SNTPClock {
     }
     
     
-    private byte[] longToNTPTimeStamp(long now) {
+    public static byte[] longToNTPTimeStamp(long now) {
         
         // convert msec to sec
         int time1 = (int) now / 1000;
@@ -135,26 +138,69 @@ public class SNTPClock {
         return b;
     }
     
-    private long NTPTimeStampToLong(byte[] b) {
+    public static long NTPTimeStampToLong(byte[] b) {
         
         int in = (b[0] & 0xff) | ((b[1] << 8) & 0xff00) | ((b[2] << 24) >>> 8) | (b[3] << 24);
         return 0;
     }       
     
-    public static void main(String args[]) throws Exception {
-        SNTPClock sc = new SNTPClock();
-        
-        byte[] b = sc.longToNTPTimeStamp(256256);
-        
+    // Returns a bitset containing the values in bytes.
+    // The byte-ordering of bytes must be big-endian which means the most significant bit is in element 0.
+    public static BitSet fromByteArray(byte[] bytes) {
+        BitSet bits = new BitSet();
+        for (int i=0; i<bytes.length*8; i++) {
+            if ((bytes[bytes.length-i/8-1]&(1<<(i%8))) > 0) {
+                bits.set(i);
+            }
+        }
+        return bits;
+    }
+
+    public static void printByteArray(byte[] b) {
         for (int i=0; i<b.length; i++) {
             System.out.print(b[i] + " ");
         }
-        
-        //SNTPClock sc2 = new SNTPClock();
+    }
+    
 
-          //      sc2.send();
+    public static void floatToFixedPoint(float foo) {
 
-//        sc.receive();
+	foo = foo % 1;
+	int idx = 0;
+
+	while (idx < 32) {
+	    float x = foo * 2;
+	    if (x>=1) {
+		System.out.print("1");
+	    } else {
+		System.out.print("0");
+	    }
+	    idx++;
+	    foo = foo * 10;
+	    foo = foo % 1;		
+	}
+
+    }
+    
+    public static void main(String args[]) throws Exception {
+
+	float myFloat = (float).25;
+
+        System.out.println("longToNTPTimeStamp test");
+        byte[] b = longToNTPTimeStamp(256000);
+        printByteArray(b);
+
+
+
+	System.out.println("floatToFixedPoint test");
+	floatToFixedPoint(myFloat);
+
+	System.out.println("BitSet test");
+        System.out.println("");
+        BitSet bits = fromByteArray(b);
+        System.out.println(bits.toString());        
+
+
         
     }
     
