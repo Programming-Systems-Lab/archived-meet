@@ -10,8 +10,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Date;
-import java.math.BigInteger;
-import java.math.BigDecimal;
 import java.util.BitSet;
 
 
@@ -26,11 +24,17 @@ public class SNTPClock {
     
     // offset from the system clock, this is updated
     // instead of actual system clock
+    // (keep away from native methods for now)
     long offset;
  
-    // automatically update at certain intervals
+    // automatically update clock at certain intervals
     long updateInterval;
     
+    // NTP Server to use
+    final String server = "sundial.columbia.edu";
+    final int port = 123;
+
+
     /** Creates a new instance of SNTPClock */
     public SNTPClock() {
     }
@@ -53,22 +57,22 @@ public class SNTPClock {
     }
 */
     
-    public void send() throws Exception {
+    public void send(byte[] data) throws Exception {
+
         // create empty packet
-        byte[] data = new byte[128];
+        //byte[] data = new byte[128];
+
         
-        // how about the ASCII table, or 7bit ASCII at least
-        for (int i=0; i<128; i++) {
-            data[i] = (byte)i;
-        }
-        
-        
-        // create socket to localhost?
-        InetAddress address = InetAddress.getLocalHost();
+        // create socket to server
+        InetAddress address = InetAddress.getByName("sundial.columbia.edu");
+	printByteArray(address.getAddress());
+	//InetAddress address = InetAddress.getLocalHost();
+
         DatagramSocket socket = new DatagramSocket();
+	socket.connect(address,port);
 
         // create packet
-        DatagramPacket packet = new DatagramPacket(data,128,address,3156);
+        DatagramPacket packet = new DatagramPacket(data,128,address,port);
 
         
         // send packet
@@ -76,6 +80,24 @@ public class SNTPClock {
         socket.send(packet);
         System.out.println("Packet sent\n");
         
+
+
+	
+	byte[] rx = new byte[128];
+	packet = new DatagramPacket(rx,128);
+
+
+
+        System.out.println("waiting for packet\n");
+        socket.receive(packet);
+            
+        // print out what was received
+        //String msg = new String(packet.getData());
+
+        System.out.println("received: ");
+        printByteArray(packet.getData());
+
+	
     }
     
     public void receive() throws Exception {
@@ -91,12 +113,13 @@ public class SNTPClock {
 
         System.out.println("waiting for packet\n");
         socket.receive(packet);
-            
+
         // print out what was received
         String msg = new String(packet.getData());
 
-        System.out.println("received: " + msg);
-        
+        System.out.println("received: ");
+        printByteArray(packet.getData());
+
     }
     
     public void syncTime() {
@@ -110,13 +133,15 @@ public class SNTPClock {
         int time1 = (int) now / 1000;
 
         // get remainder for 2nd part of timestamp
-        int time2 = (int) now % 1000;
+        long time2 = now % 1000;
         float foo = (float) time2 /  1000;
         
-        System.out.println("first 32: " + time2);
-        System.out.println("second 32: " + foo);
-        
-        time2 = Float.floatToRawIntBits(foo);
+	//DEBUG
+        //System.out.println("first 32: " + time1);
+        //System.out.println("second 32: " + foo);
+
+        BitSet bs = floatToFixedPoint(foo);
+        byte[] b2 = toByteArray(bs);
         
         byte[] b = new byte[8];
         
@@ -130,19 +155,41 @@ public class SNTPClock {
         b[2] = (byte)((time1 >> 16) & 0xff);
         b[3] = (byte)(time1 >>> 24);
 
-        b[4] = (byte)(time2 & 0xff);
-        b[5] = (byte)((time2 >> 8) & 0xff);
-        b[6] = (byte)((time2 >> 16) & 0xff);
-        b[7] = (byte)(time2 >>> 24);
+	b[4] = b2[0];
+	b[5] = b2[1];
+	b[6] = b2[2];
+	b[7] = b2[3];
 
         return b;
     }
+
+
     
     public static long NTPTimeStampToLong(byte[] b) {
         
         int in = (b[0] & 0xff) | ((b[1] << 8) & 0xff00) | ((b[2] << 24) >>> 8) | (b[3] << 24);
         return 0;
     }       
+
+
+
+    public static byte[] createSNTPRequest(byte[] time) {
+	
+	byte[] output = new byte[128];
+	output[0] = 67;
+	
+	for (int i=1; i < output.length; i++) {
+	    output[i] = 0;
+	}
+
+	for (int i=0; i < 8; i++) {
+	    output[32+i] = time[i];
+	}
+
+	return output;
+
+    }
+
     
     // Returns a bitset containing the values in bytes.
     // The byte-ordering of bytes must be big-endian which means the most significant bit is in element 0.
@@ -156,52 +203,73 @@ public class SNTPClock {
         return bits;
     }
 
+
+
+
+    public static byte[] toByteArray(BitSet bits) {
+        byte[] bytes = new byte[4];
+
+	for (int i=0; i<4; i++) {
+	    for (int j=0; j<8; j++) {
+		if (bits.get(8*i + j)) {
+		    bytes[4-(i)-1] |= 1 << j;
+		}
+	    }
+	}
+
+        return bytes;
+    }
+
+
+
     public static void printByteArray(byte[] b) {
         for (int i=0; i<b.length; i++) {
             System.out.print(b[i] + " ");
+	    if (i % 8 == 7) System.out.print("\n");
         }
     }
     
 
-    public static void floatToFixedPoint(float foo) {
+    public static BitSet floatToFixedPoint(float foo) {
+
+	BitSet output = new BitSet(32);
 
 	foo = foo % 1;
 	int idx = 0;
 
 	while (idx < 32) {
-	    float x = foo * 2;
-	    if (x>=1) {
-		System.out.print("1");
-	    } else {
-		System.out.print("0");
+	    if (foo >= 0.5) {
+		output.set(31-idx);
 	    }
 	    idx++;
 	    foo = foo * 10;
 	    foo = foo % 1;		
 	}
 
+	return output;
+
     }
+
+
     
     public static void main(String args[]) throws Exception {
 
-	float myFloat = (float).25;
-
-        System.out.println("longToNTPTimeStamp test");
-        byte[] b = longToNTPTimeStamp(256000);
+	Date myDate = new Date();
+	long now = myDate.getTime();
+        byte[] b = longToNTPTimeStamp(now);
         printByteArray(b);
 
+	System.out.println("");
 
+	byte[] b2 = createSNTPRequest(b);
+	//printByteArray(b2);
 
-	System.out.println("floatToFixedPoint test");
-	floatToFixedPoint(myFloat);
+	SNTPClock sc = new SNTPClock();
 
-	System.out.println("BitSet test");
-        System.out.println("");
-        BitSet bits = fromByteArray(b);
-        System.out.println(bits.toString());        
+	sc.send(b2);
 
+	sc.receive();
 
-        
     }
     
 }
