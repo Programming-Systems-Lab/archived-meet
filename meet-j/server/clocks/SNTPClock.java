@@ -108,7 +108,10 @@ public class SNTPClock {
 
         // get remainder for 2nd part of timestamp
         int time2 = (int) now % 1000;
-        float foo = (float) foo /  1000;
+        float foo = (float) time2 /  1000;
+        
+        System.out.println("first 32: " + time2);
+        System.out.println("second 32: " + foo);
         
         time2 = Float.floatToRawIntBits(foo);
         
@@ -135,15 +138,23 @@ public class SNTPClock {
     private long NTPTimeStampToLong(byte[] b) {
         
         int in = (b[0] & 0xff) | ((b[1] << 8) & 0xff00) | ((b[2] << 24) >>> 8) | (b[3] << 24);
+        return 0;
     }       
     
     public static void main(String args[]) throws Exception {
         SNTPClock sc = new SNTPClock();
-        SNTPClock sc2 = new SNTPClock();
+        
+        byte[] b = sc.longToNTPTimeStamp(256256);
+        
+        for (int i=0; i<b.length; i++) {
+            System.out.print(b[i] + " ");
+        }
+        
+        //SNTPClock sc2 = new SNTPClock();
 
-                sc2.send();
+          //      sc2.send();
 
-        sc.receive();
+//        sc.receive();
         
     }
     
