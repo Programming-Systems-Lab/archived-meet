@@ -6,10 +6,15 @@
 
 package psl.meet.server.types;
 
+import java.util.HashMap;
+
 /**
  * @author phil
  */
-public class TypeManager extends Object {
+public class TypeManager extends Object implements IEvent {
+    
+    // keys are longs, values are av_list
+    protected HashMap av_lists;
     
     /** Creates new TypeManager */
     public TypeManager() {
@@ -33,5 +38,7 @@ public class TypeManager extends Object {
         }
         
     }
-    
+
+    class AVList {
+    }
 }

@@ -32,6 +32,34 @@ public interface IEvent {
     public static final byte MEET_ETYPE_ROUTER      = 8;  
     public static final byte MEET_ETYPE_SCHEDULER   = 9; 
     public static final byte MEET_ETYPE_STORE       = 10; 
-    public static final byte MEET_ETYPE_TYPE        = 11; 
+    public static final byte MEET_ETYPE_TYPE        = 11;   
+    public static final byte MEET_ETYPE_USER        = 127;
+    
+    public static final int MEET_TYPE_ATTVAL_SET    = 0;
+    public static final int MEET_TYPE_ATTVAL_LIST   = 10;
+    public static final int MEET_TYPE_XML_SCHEMA    = 20;
+    public static final int MEET_TYPE_JAVA          = 30;
+    public static final int MEET_TYPE_CLR           = 40;
+    
+    public static final int MEET_PRIMITIVE_INT8     = 0;
+    public static final int MEET_PRIMITIVE_INT16    = 1;
+    public static final int MEET_PRIMITIVE_INT32    = 2;
+    public static final int MEET_PRIMITIVE_INT64    = 3;
+    
+    public static final int MEET_PRIMITIVE_UINT8    = 10;
+    public static final int MEET_PRIMITIVE_UINT16   = 11;
+    public static final int MEET_PRIMITIVE_UINT32   = 12;
+    public static final int MEET_PRIMITIVE_UINT64   = 13;
+    
+    
+    public static final int MEET_PRIMITIVE_FLOAT32  = 20;
+    public static final int MEET_PRIMITIVE_FLOAT64  = 21;
+    
+    public static final int MEET_PRIMITIVE_CHAR     = 100;
+    public static final int MEET_PRIMITIVE_CHAR16   = 101;
+    public static final int MEET_PRIMITIVE_CHAR32   = 102;
+    
+    // 4 byte secs since 1 Jan 1970 GMT, 4 bytes fraction
+    public static final int MEET_PRIMITIVE_TSTAMP   = 200;  
 
 }
