@@ -13,7 +13,11 @@ package psl.meet.server.core;
  */
 public interface IManager {
     
+    // result codes
     public static final int MEET_SUCCESS = 0;
+    
+    // status codes
+    public static final int MEET_STATUS_OK = 0;
     
     /** 
      * returns an integer representing the status of the manager itself

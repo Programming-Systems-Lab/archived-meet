@@ -28,7 +28,7 @@ public class Manager implements IProbe, IManager {
     public Manager (String name) {
         modules = new LinkedHashMap();
         myName = name;
-        logger.debug("Manager " + name + ": created");
+        logger.debug("Manager " + myName + ": created");
     }
     
     
@@ -37,14 +37,21 @@ public class Manager implements IProbe, IManager {
      * @return success code
      *
      */    
-    int getStatus();
+    public int getStatus() {
+        logger.debug("Manager " + myName + ": getStatus called");
+        return MEET_STATUS_OK;
+    }
     
     /** 
      * returns an integer representing the status of the manager itself
      * @return success code
      *
      */   
-    String[] list();
+    public String[] list() {
+        String dummy[] = new String[1];
+        logger.debug("Manager " + myName + ": list() called");
+        return dummy;
+    }
     
      /**
      * returns an integer representing the status of the manager itself
@@ -52,6 +59,8 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int add() throws MEETException {
+        logger.debug("Manager " + myName + ": add called");
+        return MEET_STATUS_OK;
     }
     
     
@@ -61,6 +70,8 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int delete() throws MEETException {
+        logger.debug("Manager " + myName + ": delete called");
+        return MEET_STATUS_OK;
     }
     
     
@@ -69,54 +80,37 @@ public class Manager implements IProbe, IManager {
      * Ideally globabally unique, but at least unique in combination with location
      */
     public String getInstance() {
+        logger.debug("Manager " + myName + ": getInstance called");
+        return "this one right here";
     }
     
+        /** 
+     * instruct a module to restart itself
+     * @return success code
+     * @throws MEETException Internal error
+     *
+     */   
+    public int reload() throws MEETException {
+        return MEET_STATUS_OK;
+    }
+
     /** return a string representing the location of this probe, generally based
      * on the location/identity of the "probee"
      */
     public String getLocation() {
-    }
-    
-    /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     *
-     */
-    public int getStatus() {
+        logger.debug("Manager " + myName + ": getLocation called");
+        return "over there";
     }
     
     /** return a string indicating the class of this probe
      */
     public String getType() {
+        return "generic manager";
     }
     
     
-    public void install(String confName, String host, String system) {
-    }
-    
-    /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     *
-     */
-    public String[] list() {
-    }
-    
-    /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     * @throws MEETException Internal error
-     */
     public int lock() throws MEETException {
-    }
-    
-    /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     * @throws MEETException Internal error
-     *
-     */
-    public int reload() throws MEETException {
+        return MEET_STATUS_OK;
     }
     
     /**
@@ -125,14 +119,7 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int start() throws MEETException {
-    }
-    
-    /**
-     * returns an integer representing the status of the manager itself
-     * @return success code
-     * @throws MEETException Internal error
-     */
-    public int startAll() throws MEETException {
+        return MEET_STATUS_OK;
     }
     
     /**
@@ -141,34 +128,27 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int stop() throws MEETException {
+        return MEET_STATUS_OK;
     }
     
-    /**
-     * returns an integer representing the status of the manager itself
+        /** 
+     * stop all modules in this subsystem
      * @return success code
      * @throws MEETException Internal error
-     */
+     */   
     public int stopAll() throws MEETException {
+        return MEET_STATUS_OK;
     }
     
-    
-    /**
-     *   The probe is activated so that it
-     *   senses behavior in the running system. In this activated state, the
-     *   probes may issue Sense events for some subset of the behavior they
-     *   observe.
-     */
-    public void activate() {
+    /** 
+     * start all modules in this subsystem
+     * @return success code
+     * @throws MEETException Internal error
+     */   
+    public int startAll() throws MEETException {
+        return MEET_STATUS_OK;
     }
-    
-    /**   The probe
-     *   is deactivated so that it stops sensing behavior in the running
-     *   system. In this deactivated state, the probe may not issue any Sense
-     *   events.
-     */
-    public void deactivate() {
-    }
-    
+
     /**   Parameter1 through ParameterN are passed to the probe to "focus" its
      *   sensors
      *   as specified by the parameters. How it interprets these parameters
@@ -182,6 +162,7 @@ public class Manager implements IProbe, IManager {
      *   request is answered through a Generate-Sensed event.
      */
     public void querySensed() {
+
     }
     
     /**
@@ -190,6 +171,23 @@ public class Manager implements IProbe, IManager {
      * @throws MEETException Internal error
      */
     public int setDefault(String module) throws MEETException {
+        return MEET_STATUS_OK;
     }
     
+    /** 
+     *   The probe is activated so that it
+     *   senses behavior in the running system. In this activated state, the
+     *   probes may issue Sense events for some subset of the behavior they
+     *   observe. 
+     */    
+    public void activate() { }
+    
+    /**
+     *   The probe
+     *   is deactivated so that it stops sensing behavior in the running
+     *   system. In this deactivated state, the probe may not issue any Sense
+     *   events.
+     */
+    public void deactivate() { }    
+
 }
