@@ -3,10 +3,12 @@
  *
  * Created on December 6, 2002, 1:41 AM
  */
-package psl.meet.server.clocks;
+//package psl.meet.server.clocks;
 
 import java.util.BitSet;
 import java.util.Date;
+import java.math.BigInteger;
+import java.lang.Math;
 
 /**
  *
@@ -18,87 +20,151 @@ public class NTPTimeStamp {
     // milliseconds since Jan 1 1900 00:00:00 UT
     private long milli;
 
+    // seconds since Epoch
+    private long secs;
+
+    // fraction of a second
+    private float fracsecs;
+
+    // system offset, seconds between 1970 and 1900
+    //private long OFFSET = 2208970800;
+    //private final long OFFSET = 0;
+
+    private final BigInteger OFFSET = new BigInteger("2208970800");
 
     public NTPTimeStamp() {
 	Date now = new Date();
-	milli = now.getTime();;
+	secs = (long)(now.getTime() / 1000);
+	secs += OFFSET.longValue();
+
+	// parse into fracsecs
+	float foo = (float)(now.getTime() % 1000);
+	fracsecs = foo / 1000;
+    }
+
+    public NTPTimeStamp(int tz) {
+	Date now = new Date();
+	secs = (long)(now.getTime() / 1000);
+	secs += OFFSET.longValue();
+	secs -= tz*3600;
+
+	// parse into fracsecs
+	float foo = (float)(now.getTime() % 1000);
+	fracsecs = foo / 1000;
+
     }
 
 
-    public NTPTimeStamp(long time) {
-	milli = time;
+    // time == milliseconds since 1970
+    public NTPTimeStamp(long time, int tz) {
+	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
+	float foo = (float)(time % 1000);
+	fracsecs = foo / 1000;
+    }
+
+    public NTPTimeStamp(Date now, int tz) {
+	long time = now.getTime();
+	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
+
+	float foo = (float)(time % 1000);
+	fracsecs = foo / 1000;
     }
 
 
     public NTPTimeStamp(byte[] b) {
 
 	// parse the bytes to get a long
+
+	byte[] c = new byte[5];
+	c[0] = 0;
+	c[1] = b[0];
+	c[2] = b[1];
+	c[3] = b[2];
+	c[4] = b[3];
+
+	BigInteger bigint = new BigInteger(c);
+        secs = bigint.longValue();
+
+	byte[] d = new byte[4];
+
+	for (int i=0; i<4; i++) {
+	    d[i] = b[i+4];
+	}
+
+	// parse last four bytes
+	fracsecs = bytesToFloat(d);
+    }
+
+    public long getSecs() {
+	return secs;
+    }
+
+    public float getFracSecs() {
+	return fracsecs;
+    }
+
+    public long getLong() {
+	long foo = (long)(1000 * fracsecs);
+
+	//System.out.println("secs = " + secs);
+	//System.out.println("fracsecs = " + fracsecs);
+
+	return (1000*secs + foo);
     }
 
 
-    // take the milliseconds, return
+    // take the seconds, return
     // 8 bytes in NTP Timestamp format
     // for use in Tx and Rx of NTP info
 
     public byte[] getBytes() {
 
-	long now = milli;
+	BigInteger bar = BigInteger.valueOf(secs);
+	byte[] b1 = bar.toByteArray();
 
-        // convert msec to sec
-        int time1 = (int) now / 1000;
+	
+	if (b1.length > 4) {
+	    for (int i=0; i<4; i++) {
+		b1[i] = b1[i+1];
+	    }
+	}	
 
-        // get remainder for 2nd part of timestamp
-        long time2 = now % 1000;
-        float foo = (float) time2 /  1000;
-
-        BitSet bs = floatToFixedPoint(foo);
+        BitSet bs = floatToFixedPoint(fracsecs);
         byte[] b2 = toByteArray(bs);
 
-        byte[] b = new byte[8];
+	byte[] output = new byte[8];
 
-        // in == long since Epoch
-        // must convert to NTP TimeStamp format
-        // first 32 bits = seconds since 1900 00:00:00 UT
-        // second 32 bits = fixed point fraction of a second
+	for (int i=0; i< 4; i++) {
+	    output[i] = b1[i];
+	    output[i+4] = b2[i];
+	}
 
-        b[0] = (byte)(time1 & 0xff);
-        b[1] = (byte)((time1 >> 8) & 0xff);
-        b[2] = (byte)((time1 >> 16) & 0xff);
-        b[3] = (byte)(time1 >>> 24);
+	return output;
 
-        b[4] = b2[0];
-        b[5] = b2[1];
-        b[6] = b2[2];
-        b[7] = b2[3];
-
-	return b;
     }
 
 
-    // method to take byte array and
-    // calculate proper long
-
-    public static long NTPTimeStampToLong(byte[] b) {
-
-        int in = (b[0] & 0xff) | ((b[1] << 8) & 0xff00) | ((b[2] << 24) >>> 8) | (b[3] << 24);
-        return 0;
-    }
-
-
-
+    
     // Returns a bitset containing the values in bytes.
-    // The byte-ordering of bytes must be big-endian which means the most significant bit is in element 0.
+    // The byte-ordering of bytes must be big-endian which means
+    // the most significant bit is in element 0.
+
     public static BitSet fromByteArray(byte[] bytes) {
-	BitSet bits = new BitSet();
-	for (int i=0; i<bytes.length*8; i++) {
-	    if ((bytes[bytes.length-i/8-1]&(1<<(i%8))) > 0) {
-		bits.set(i);
+	BitSet bits = new BitSet(32);
+
+	for (int i=0; i<4; i++) {
+	    for (int j=0; j<8; j++) {
+		if ((bytes[4-i-1] & (1 << j)) > 0) {
+		    bits.set(8*i + j);
+		}
 	    }
 	}
+
 	return bits;
     }
     
-
+    
+    
     private static byte[] toByteArray(BitSet bits) {
         byte[] bytes = new byte[4];
 
@@ -114,11 +180,29 @@ public class NTPTimeStamp {
     }
 
 
+
     private static void printByteArray(byte[] b) {
         for (int i=0; i<b.length; i++) {
             System.out.print(b[i] + " ");
             if (i % 8 == 7) System.out.print("\n");
         }
+    }
+
+
+    private static float bytesToFloat(byte[] b) {
+	
+	float output = 0;
+
+	BitSet bs = fromByteArray(b);
+
+	for (int i=0; i<32; i++) {
+	    if (bs.get(i)) {
+		output += Math.pow(2,i-32);
+	    }
+	}
+
+	return output;
+
     }
 
 
@@ -145,14 +229,36 @@ public class NTPTimeStamp {
 
     public static void main(String args[]) throws Exception {
 
+	Date nowDate = new Date();
+	System.out.println("Date:");
+	System.out.println(nowDate.getTime());
+
+	System.out.println("Test default constructor");
 	NTPTimeStamp now = new NTPTimeStamp();
-
 	printByteArray(now.getBytes());
+	System.out.println(now.getLong());
 
-	Date epochcalc = new Date(0,0,1);
+	System.out.println("Test byte[] constructor");
 
-	System.out.println(epochcalc);
-	System.out.println(epochcalc.getTime());
+	byte[] b = new byte[8];
+	b[0] = -125;
+	b[1] = -86;
+	b[2] = 56;
+	b[3] = 48;
+	b[4] = -128;
+	b[5] = 0;
+	b[6] = 0;
+	b[7] = 0;
+	NTPTimeStamp byteTest = new NTPTimeStamp(b);
+	printByteArray(byteTest.getBytes());
+	System.out.println(byteTest.getLong());
+
+	System.out.println("Test long constructor");
+	
+	BigInteger BigOffset = new BigInteger("2208970800000");
+	NTPTimeStamp longTest = new NTPTimeStamp(BigOffset.longValue(),-5);
+	printByteArray(longTest.getBytes());
+	System.out.println(longTest.getLong());
 
     }
     

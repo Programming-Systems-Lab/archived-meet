@@ -3,7 +3,7 @@
  *
  * Created on November 7, 2002, 8:34 PM
  */
-package psl.meet.server.clocks;
+
 
 
 import java.net.DatagramPacket;
@@ -19,73 +19,81 @@ import java.util.BitSet;
  */
 public class SNTPClock {
     
-    // multicast or unicast client
+    // multicast or unicast client, unused for now
     boolean multiCastMode;
     
     // offset from the system clock, this is updated
     // instead of actual system clock
     // (keep away from native methods for now)
-    long offset;
+    private long offset;
 
-    // built in offset
-    // most systems count from 1 Jan 1970
-    long sys_offset;
-
+    // roundtrip delay in communicating with NTP server
+    private long delay;
  
     // automatically update clock at certain intervals
-    long updateInterval;
+    private long updateInterval;
     
     // NTP Server to use
-    public String server;
-    public int port;
+    private String server;
+    private int port;
 
+    private int timezone = -5;
 
     /** Creates a new instance of SNTPClock */
     public SNTPClock() {
-	// number of milliseconds from 1970 to 1970
-	sys_offset = 2208970800000;
+	server = "";
+	port = 0;
+	timezone = 0;
+	updateInterval = -1;
+	delay = 0;
+	offset = 0;
     }
 
-
-    public SNTPClock(long s_offset) {
-	sys_offset = s_offset;
+    public SNTPClock(String srvr, int p, int tz, long updateint) {
+	server = srvr;
+	port = p;
+	timezone = tz;
+	updateInterval = updateint;
+	delay = 0;
+	offset = 0;
     }
 
-    
+    public void setTimezone(int tz) {
+	timezone = tz;
+    }
+
+    public void setSource(String srvr, int p) {
+	server = srvr;
+	port = p;
+    }
+
+    public void setUpdateInterval(long ui) {
+	updateInterval = ui;
+    }
+
     public long getTime() {
-	Date now = new Date();
-        return now.getTime() + offset + sys_offset;
+	NTPTimeStamp now = new NTPTimeStamp(timezone);
+	return now.getLong() + offset;
     }
-
-
-    // get time relative to the system time
-    // i.e. do not add the offset from 1970 -> 1900
-    public long getTimeRelSysTime() {
-	return now.getTime() + offset;
-    }
-
 
     public long getOffset() {
 	return offset;
     }
-    
 
-
-    public setSource(SourceDesc src) {
-        
+    public long getDelay() {
+	return delay;
     }
 
+
+    public void sync() throws Exception {
+	byte[] b = this.createSNTPRequest();
+	this.send(b);
+    }
     
     public void send(byte[] data) throws Exception {
 
-        // create empty packet
-        //byte[] data = new byte[40];
-
-        
         // create socket to server
         InetAddress address = InetAddress.getByName(server);
-	//printByteArray(address.getAddress());
-	//InetAddress address = InetAddress.getLocalHost();
 
         DatagramSocket socket = new DatagramSocket();
 	socket.connect(address,port);
@@ -102,26 +110,57 @@ public class SNTPClock {
 
 
 	
-	byte[] rx = new byte[128];
-	packet = new DatagramPacket(rx,128);
+	byte[] rx = new byte[48];
+	packet = new DatagramPacket(rx,48);
 
 	//socket.disconnect();
 	//socket.close();
 
 	
-        System.out.println("waiting for packet\n");
+        //System.out.println("waiting for packet\n");
         socket.receive(packet);
-            
-        // print out what was received
-        //String msg = new String(packet.getData());
 
-        System.out.println("received: ");
-        printByteArray(packet.getData());
-		
+        NTPTimeStamp T4 = new NTPTimeStamp(timezone);
+
+	byte[] t1 = new byte[8];
+	for (int i=0; i<8; i++) {
+	    t1[i] = rx[24+i];
+	}
+	NTPTimeStamp T1 = new NTPTimeStamp(t1);
+
+	byte[] t2 = new byte[8];
+	for (int i=0; i<8; i++) {
+	    t2[i] = rx[32+i];
+	}
+	NTPTimeStamp T2 = new NTPTimeStamp(t2);
+
+	byte[] t3 = new byte[8];
+	for (int i=0; i<8; i++) {
+	    t3[i] = rx[40+i];
+	}
+	NTPTimeStamp T3 = new NTPTimeStamp(t3);
+
+	// delay and offset, as defined in RFC 2030
+
+	delay = ( (T4.getLong() - T1.getLong()) - (T2.getLong() - T3.getLong()) );
 	
-	
-    }
+	offset = (long)(( (T2.getLong() - T1.getLong()) + (T3.getLong() - T4.getLong()) ) / 2);
+
+
+
+	//DEBUG
+	System.out.println("T1 = " + T1.getLong());
+	System.out.println("T2 = " + T2.getLong());
+	System.out.println("T3 = " + T3.getLong());
+	System.out.println("T4 = " + T4.getLong());
+
+	System.out.println("delay = " + delay);
+	System.out.println("offset = " + offset);
     
+    }
+
+
+    /// currently unused, could be useful for multi/anycast    
     public void receive() throws Exception {
         
         //create empty packet
@@ -145,18 +184,12 @@ public class SNTPClock {
     }
 
     
-    public void syncTime() {
-        
-    }
-    
-    
+    public byte[] createSNTPRequest() {
 
-
-    
-    public static byte[] createSNTPRequest(byte[] time) {
+	NTPTimeStamp ntptime = new NTPTimeStamp(timezone);
+	byte[] time = ntptime.getBytes();
 	
 	byte[] output = new byte[48];
-
 	
 	for (int i=0; i < output.length; i++) {
 	    output[i] = 0;
@@ -176,6 +209,7 @@ public class SNTPClock {
     }
 
     
+    // DEBUG
     public static void printByteArray(byte[] b) {
         for (int i=0; i<b.length; i++) {
             System.out.print(b[i] + " ");
@@ -187,24 +221,12 @@ public class SNTPClock {
     
     public static void main(String args[]) throws Exception {
 
-	Date myDate = new Date();
-	long now = myDate.getTime();
-        byte[] b = longToNTPTimeStamp(now);
-        printByteArray(b);
+	SNTPClock sc = new SNTPClock(args[0], Integer.parseInt(args[1]), -5, 0);
 
-	System.out.println("");
-
-	byte[] b2 = createSNTPRequest(b);
-	printByteArray(b2);
-
-	SNTPClock sc = new SNTPClock();
-
-	sc.server = args[0];
-	sc.port = Integer.parseInt(args[1]);
-
-	sc.send(b2);
-
-	//sc.receive();
+	while (true) {
+	    sc.sync();
+	    Thread.sleep(1000);
+	}
 
     }
     
