@@ -8,16 +8,27 @@ package psl.meet.server.types;
 
 import java.util.HashMap;
 
+import siena.Notification;
+import siena.Notifiable;
+import siena.Filter;
+
 /**
  * @author phil
  */
 public class TypeManager extends Object implements IEvent {
     
-    // keys are longs, values are av_list
-    protected HashMap av_lists;
+    // keys are longs, values are AVList
+    protected HashMap avLists;
+    // map string to AVLists key.  this might be better handled
+    // by a real DB (id, name, AVList) with two indexes
+    protected HashMap avListsNames;
+    protected HashMap sienas;
     
     /** Creates new TypeManager */
     public TypeManager() {
+        avLists = new HashMap();
+        avListsNames = new HashMap();
+        sienas = new HashMap();
     }
     
     /*
@@ -39,6 +50,9 @@ public class TypeManager extends Object implements IEvent {
         
     }
 
-    class AVList {
+
+    class AV {
+        public String att;
+        public int type;
     }
 }

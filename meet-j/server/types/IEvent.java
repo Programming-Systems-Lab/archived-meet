@@ -40,6 +40,8 @@ public interface IEvent {
     public static final int MEET_TYPE_XML_SCHEMA    = 20;
     public static final int MEET_TYPE_JAVA          = 30;
     public static final int MEET_TYPE_CLR           = 40;
+    // unadvertised bag of attvals
+    public static final int MEET_TYPE_SIENA         = 50;
     
     public static final int MEET_PRIMITIVE_INT8     = 0;
     public static final int MEET_PRIMITIVE_INT16    = 1;
