@@ -33,6 +33,8 @@ public class LamportClock implements MEETClock {
         
     }
 
+    public void run() {}
+    
     /**
      * constructor with user-defined interval, in ms
      */

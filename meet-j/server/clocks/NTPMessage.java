@@ -315,8 +315,8 @@ public class NTPMessage {
       //TODO: the below is wrong
       long result = (resultS * 1000L) + resultF;
       if (DEBUG) {
-        System.out.println("calcDelay T1 T2 T3 T4: " + T1 + " " + T2 + " " +
-          T3 + " " + T4 + " -> " + result);
+        System.out.println("calcDelay T1 T2 T3 T4: " + T1s + " " + T2s + " " +
+          T3s + " " + T4s + " -> " + result);
       }
       return (long)(result * 1000.0);
     }
