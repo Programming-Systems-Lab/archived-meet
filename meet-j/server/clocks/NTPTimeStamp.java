@@ -17,21 +17,18 @@ import java.lang.Math;
 public class NTPTimeStamp {
 
 
-    // milliseconds since Jan 1 1900 00:00:00 UT
-    private long milli;
-
-    // seconds since Epoch
+    // seconds since Jan 1 1900 00:00:00 UT
     private long secs;
 
     // fraction of a second
     private float fracsecs;
 
     // system offset, seconds between 1970 and 1900
-    //private long OFFSET = 2208970800;
-    //private final long OFFSET = 0;
-
     private final BigInteger OFFSET = new BigInteger("2208970800");
 
+    /**
+     * create a new NTPTimeStamp
+     */
     public NTPTimeStamp() {
 	Date now = new Date();
 	secs = (long)(now.getTime() / 1000);
@@ -42,6 +39,11 @@ public class NTPTimeStamp {
 	fracsecs = foo / 1000;
     }
 
+
+    /**
+     * create a new NTPTimeStamp, where
+     * system clock is set to a non-UT timezone
+     */
     public NTPTimeStamp(int tz) {
 	Date now = new Date();
 	secs = (long)(now.getTime() / 1000);
@@ -55,13 +57,19 @@ public class NTPTimeStamp {
     }
 
 
-    // time == milliseconds since 1970
+    /**
+     * create an NTPTimeStamp for a given timestamp and timezone
+     * time == milliseconds since 1970
+     */
     public NTPTimeStamp(long time, int tz) {
 	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
 	float foo = (float)(time % 1000);
 	fracsecs = foo / 1000;
     }
 
+    /**
+     * create an NTPTimeStamp for a given Date object and timezone
+     */
     public NTPTimeStamp(Date now, int tz) {
 	long time = now.getTime();
 	secs = (long)(time / 1000) + OFFSET.longValue() - (tz*3600);
@@ -71,6 +79,9 @@ public class NTPTimeStamp {
     }
 
 
+    /**
+     * create an NTPTimeStamp given 8 bytes in the NTP Timestamp format
+     */
     public NTPTimeStamp(byte[] b) {
 
 	// parse the bytes to get a long
@@ -95,14 +106,25 @@ public class NTPTimeStamp {
 	fracsecs = bytesToFloat(d);
     }
 
+    /**
+     * return number of seconds since 1900
+     */
     public long getSecs() {
 	return secs;
     }
 
+
+    /**
+     * return fraction of second
+     */
     public float getFracSecs() {
 	return fracsecs;
     }
 
+
+    /**
+     * return milliseconds since 1900
+     */
     public long getLong() {
 	long foo = (long)(1000 * fracsecs);
 
@@ -112,11 +134,11 @@ public class NTPTimeStamp {
 	return (1000*secs + foo);
     }
 
-
-    // take the seconds, return
-    // 8 bytes in NTP Timestamp format
-    // for use in Tx and Rx of NTP info
-
+    /**
+     * take the seconds, return
+     * 8 bytes in NTP Timestamp format
+     * for use in Tx and Rx of NTP info
+     */
     public byte[] getBytes() {
 
 	BigInteger bar = BigInteger.valueOf(secs);
@@ -144,11 +166,11 @@ public class NTPTimeStamp {
     }
 
 
-    
-    // Returns a bitset containing the values in bytes.
-    // The byte-ordering of bytes must be big-endian which means
-    // the most significant bit is in element 0.
-
+    /**
+     * Returns a bitset containing the values in bytes.
+     * The byte-ordering of bytes must be big-endian which means
+     * the most significant bit is in element 0.
+     */
     public static BitSet fromByteArray(byte[] bytes) {
 	BitSet bits = new BitSet(32);
 
@@ -164,7 +186,9 @@ public class NTPTimeStamp {
     }
     
     
-    
+    /**
+     * BitSet -> ByteArray
+     */    
     private static byte[] toByteArray(BitSet bits) {
         byte[] bytes = new byte[4];
 
@@ -180,7 +204,9 @@ public class NTPTimeStamp {
     }
 
 
-
+    /**
+     * DEBUG method
+     */
     private static void printByteArray(byte[] b) {
         for (int i=0; i<b.length; i++) {
             System.out.print(b[i] + " ");
@@ -189,6 +215,9 @@ public class NTPTimeStamp {
     }
 
 
+    /**
+     * bytes to a floating point
+     */
     private static float bytesToFloat(byte[] b) {
 	
 	float output = 0;
@@ -205,7 +234,9 @@ public class NTPTimeStamp {
 
     }
 
-
+    /**
+     * floating point to fixed point
+     */
     private static BitSet floatToFixedPoint(float foo) {
 
         BitSet output = new BitSet(32);
@@ -226,7 +257,9 @@ public class NTPTimeStamp {
 
     }
 
-
+    /**
+     * test program
+     */
     public static void main(String args[]) throws Exception {
 
 	Date nowDate = new Date();
